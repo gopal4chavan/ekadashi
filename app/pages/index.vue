@@ -26,7 +26,7 @@ usePageMetadata({
     <div class="section-heading"><div><p class="eyebrow muted">Explore</p><h2 id="explore-title">A calendar you can trust begins with clear answers.</h2></div></div>
     <div class="link-grid">
       <NuxtLink class="link-card" to="/ekadashi-calendar/"><span class="card-index">01 / CALENDAR</span><h3>Ekadashi calendar</h3><p>See the calendar roadmap and how Smarta and Vaishnava dates will be presented.</p><span class="card-arrow">↗</span></NuxtLink>
-      <NuxtLink class="link-card" to="/ekadashi-dates/2027/"><span class="card-index">02 / 2027</span><h3>Ekadashi dates 2027</h3><p>A year-specific page, ready for verified observance dates and local timings.</p><span class="card-arrow">↗</span></NuxtLink>
+      <NuxtLink class="link-card" to="/ekadashi-calendar/2027/"><span class="card-index">02 / 2027</span><h3>Ekadashi dates 2027</h3><p>Browse all 12 month-by-month pages for the 2027 calendar.</p><span class="card-arrow">↗</span></NuxtLink>
       <NuxtLink class="link-card" to="/ekadashi-calculator/"><span class="card-index">03 / CALCULATOR</span><h3>Explore Tithi</h3><p>Run a browser-based astronomy proof of concept for a date and location.</p><span class="card-arrow">↗</span></NuxtLink>
     </div>
   </section>

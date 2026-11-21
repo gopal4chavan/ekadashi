@@ -39,7 +39,9 @@ Upload the contents of `.output/public/` to Hostinger's `public_html` directory.
 
 - `/` — product landing page
 - `/ekadashi-calendar/` — calendar overview
-- `/ekadashi-dates/2026/` and `/ekadashi-dates/2027/` — year landing pages
+- `/ekadashi-calendar/2027/` through `/ekadashi-calendar/2030/` — annual indexes with crawlable links to each month
+- `/ekadashi/2027/january/` through `/ekadashi/2030/december/` — 48 dedicated monthly SEO pages, prerendered as static HTML
+- `/ekadashi-dates/2026/` — legacy year landing page; 2027 onward uses `/ekadashi-calendar/{year}/`
 - `/ekadashi-calculator/` — local astronomy/Tithi proof of concept
 - `/smarta-vs-vaishnava-ekadashi/` — observance overview
 - `/guides/what-is-ekadashi/` and `/guides/how-parana-works/` — educational pages
@@ -56,3 +58,5 @@ Astronomy Engine performs its calculations in UTC. Local date/time input is conv
 ## Validation still needed
 
 The calculator is a research preview, not a Panchanga or fasting recommendation. Before publishing Ekadashi dates or Parana windows, add independently sourced reference fixtures for Hyderabad, Mumbai, New Delhi, London, and New York; record actual provider differences; validate sunrise conventions; and separately implement/review Smarta, Vaishnava, Dashami-vedha, Mahadvadashi, Hari Vasara, and Parana rules.
+
+Monthly pages currently describe the calculation and validation status without publishing estimated fasting dates. City-specific monthly pages should be added only after location-specific observance and Parana results are validated.
