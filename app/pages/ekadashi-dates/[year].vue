@@ -11,7 +11,10 @@ useSeoMeta({
   ogDescription: () => `Explore Ekadashi observances for ${year.value}.`
 })
 useHead(() => ({
-  link: [{ rel: 'canonical', href: `${String(config.public.siteUrl).replace(/\/$/, '')}/ekadashi-dates/${year.value}/` }]
+  link: [{
+    rel: 'canonical',
+    href: `${String(config.public.siteUrl).replace(/\/$/, '')}${Number(year.value) >= 2027 && Number(year.value) <= 2030 ? `/ekadashi-calendar/${year.value}/` : `/ekadashi-dates/${year.value}/`}`
+  }]
 }))
 </script>
 
