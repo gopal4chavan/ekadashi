@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f3ea" />
+    <meta name="description" content="Simple, local Ekadashi fasting and Parana timings for your city." />
+    <title>Ekadashi — Fast with clarity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css?v=3" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Ekadashi home">
+          <span class="brand-mark">ॐ</span>
+          <span>ekadashi</span>
+        </a>
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a class="active" href="#calendar">Calendar</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#about">About</a>
+        </nav>
+        <button class="outline-button" id="change-city-top">Change city <span aria-hidden="true">↗</span></button>
+      </header>
+
+      <main id="top">
+        <section class="hero" id="calendar">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Your personal fasting calendar</p>
+            <h1>Fast with <em>clarity.</em></h1>
+            <p class="hero-text">Accurate Ekadashi dates and Parana timings, calculated for your city and your tradition.</p>
+            <div class="location-chip" id="location-chip"><span class="pin">⌖</span><span id="selected-city">Hyderabad, India</span><button id="edit-city" aria-label="Change selected city">✎</button></div>
+          </div>
+          <div class="hero-orbit" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="moon">☾</div><span class="star star-a">✦</span><span class="star star-b">✦</span><span class="star star-c">✧</span></div>
+        </section>
+
+        <section class="controls-card" aria-label="Calendar controls">
+          <div class="control-block tradition-block"><span class="control-label">Tradition</span><div class="segmented"><button class="segment active" data-tradition="smarta">Smarta</button><button class="segment" data-tradition="vaishnava">Vaishnava</button></div></div>
+          <div class="control-divider"></div>
+          <div class="control-block"><span class="control-label">Showing</span><label class="select-wrap"><select id="month-select" aria-label="Select month"><option value="0">November 2026</option><option value="1">December 2026</option><option value="2">January 2027</option><option value="3">February 2027</option></select><span>⌄</span></label></div>
+          <div class="control-divider"></div>
+          <button class="today-button" id="today-button">Today <span>→</span></button>
+        </section>
+
+        <section class="next-fast" id="next-fast">
+          <div class="section-heading"><div><p class="eyebrow muted">Up next</p><h2>Upcoming fasts</h2></div><p class="updated">Calculated locally <span class="live-dot"></span></p></div>
+          <div class="fast-grid" id="fast-grid"></div>
+        </section>
+
+        <section class="explanation" id="how-it-works"><div class="explanation-icon">✺</div><div><p class="eyebrow muted">A considered approach</p><h2>Timings that respect<br /><em>your place in the world.</em></h2><p class="explanation-text">Ekadashi begins and ends at different moments depending on where you are. We use your city's sunrise and local time to make every Parana window personal.</p><button class="text-button" id="learn-more">Learn about the calculation <span>→</span></button></div></section>
+
+        <section class="small-note" id="about"><span>✦</span><p>For spiritual practice, always follow the guidance of your family, guru, or sampradaya. These timings are a helpful reference.</p></section>
+      </main>
+
+      <footer><span>© 2026 ekadashi</span><span>Made for a mindful day <span class="footer-om">ॐ</span></span></footer>
+    </div>
+
+    <div class="modal-backdrop" id="city-modal" hidden><div class="city-modal" role="dialog" aria-modal="true" aria-labelledby="city-title"><button class="close-modal" id="close-modal" aria-label="Close">×</button><p class="eyebrow">Set your location</p><h2 id="city-title">Find timings for<br /><em>your city.</em></h2><p class="modal-copy">Choose manually, or let your browser suggest a location. We never store your precise location.</p><button class="location-button" id="detect-location">⌖ Detect my location</button><div class="or"><span></span>or choose manually<span></span></div><label class="field-label" for="city-select">City</label><select class="city-select" id="city-select"><option value="Hyderabad">Hyderabad, India</option><option value="Mumbai">Mumbai, India</option><option value="Delhi">New Delhi, India</option><option value="Bengaluru">Bengaluru, India</option><option value="London">London, United Kingdom</option><option value="New York">New York, United States</option><option value="Singapore">Singapore</option></select><button class="primary-button" id="use-city">Use this city <span>→</span></button><p class="location-status" id="location-status" role="status"></p></div></div>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="app.js?v=3"></script>
+  </body>
+</html>
