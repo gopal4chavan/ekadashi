@@ -1,0 +1,39 @@
+---
+/**
+ * Page header with the location control to the right of the title.
+ * Render it inside a card; the title can be overridden with the `title` slot.
+ */
+import { defaultCitySlug } from '../data/cities';
+import CityCombobox from './CityCombobox.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  /** Pins the starting city (city pages) instead of the visitor's saved one. */
+  initialCity?: string;
+  /** City pages: choosing a city opens that city's page rather than recalculating. */
+  navigateOnCity?: boolean;
+}
+const { title = '', subtitle, initialCity, navigateOnCity = false } = Astro.props;
+---
+<div
+  class="loc-block"
+  data-location-picker
+  data-initial-city={initialCity}
+  data-city-nav={navigateOnCity ? 'true' : undefined}
+>
+  <div class="loc-header">
+    <h1 class="loc-title"><slot name="title">{title}</slot></h1>
+    <CityCombobox id="page-city" selected={initialCity ?? defaultCitySlug} />
+  </div>
+
+  {subtitle && <p class="hero-paran">{subtitle}</p>}
+
+  <p class="loc-status" aria-live="polite">
+    <Icon name="pin" class="icon-accent" size={16} />
+    <span data-loc-text>Detecting…</span>
+  </p>
+
+  <p class="note" data-loc-error hidden></p>
+</div>

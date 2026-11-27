@@ -1,0 +1,304 @@
+---
+/**
+ * The next Ekadashi for a location, with Smarta and Vaishnava as two cards
+ * inside one main card. Used by the home, kab hai, paran, calculator and city
+ * pages so they all look and behave the same; `variant` only changes the
+ * heading and how much detail each card carries.
+ */
+import AdSlot from './AdSlot.astro';
+import Icon from './Icon.astro';
+import LocationPicker from './LocationPicker.astro';
+
+type Variant = 'kab-hai' | 'paran' | 'calculator';
+
+interface Props {
+  variant?: Variant;
+  title?: string;
+}
+
+const { variant = 'kab-hai', title } = Astro.props;
+
+interface Fact {
+  field: string;
+  label: string;
+  vaishnavaOnly?: boolean;
+}
+
+const tithiStart: Fact = { field: 'tithi-start', label: 'Tithi starts' };
+const tithiEnd: Fact = { field: 'tithi-end', label: 'Tithi ends' };
+const sunrise: Fact = { field: 'sunrise', label: 'Sunrise' };
+const sunset: Fact = { field: 'sunset', label: 'Sunset' };
+const arunodaya: Fact = { field: 'arunodaya', label: 'Arunodaya' };
+const hari: Fact = { field: 'hari', label: 'Hari Vasara ends', vaishnavaOnly: true };
+
+const factsByVariant: Record<Variant, Fact[]> = {
+  paran: [hari],
+  'kab-hai': [tithiStart, tithiEnd, sunrise, hari],
+  calculator: [tithiStart, tithiEnd, sunrise, sunset, arunodaya, hari],
+};
+
+const traditions = [
+  { key: 'smarta', label: 'Smarta' },
+  { key: 'vaishnava', label: 'Vaishnava' },
+];
+
+const isCalculator = variant === 'calculator';
+const showHeroName = variant !== 'paran';
+const heading = title ?? (isCalculator ? 'Ekadashi & Paran Calculator' : 'Ekadashi kab hai?');
+const subtitle = isCalculator
+  ? 'The next Ekadashi fasting date and Paran window for your exact location, calculated in your browser.'
+  : undefined;
+---
+<section class="next-ekadashi" data-next-ekadashi>
+  <article class="hero-card">
+    {variant === 'paran' ? (
+      <LocationPicker>
+        <Fragment slot="title"><span data-hero-name>Ekadashi</span> paran kab hai?</Fragment>
+      </LocationPicker>
+    ) : (
+      <LocationPicker
+        title={heading}
+        subtitle={subtitle}
+      />
+    )}
+
+    <div class="kab-results" data-results hidden>
+      {showHeroName && <p class="hero-name" data-hero-name></p>}
+
+      <p class="note-line" data-differ hidden>
+        <Icon name="info" class="icon-accent" size={16} />
+        Smarta and Vaishnava fast on different days this time.
+      </p>
+
+      <div class="tradition-grid flat-cards">
+        {traditions.map((t) => {
+          const facts = factsByVariant[variant].filter(
+            (fact) => !fact.vaishnavaOnly || t.key === 'vaishnava',
+          );
+          return (
+          <section class="tradition-card" data-trad={t.key}>
+            <header><h2>{t.label}</h2></header>
+
+            <p class="t-label">
+              <Icon name="calendar" class="icon-accent" size={16} />
+              Fasting date
+            </p>
+            <p class="paran-date" data-field="fast"></p>
+
+            <p class="t-label">
+              <Icon name="calendar" class="icon-accent" size={16} />
+              Paran date
+            </p>
+            <p class="paran-date" data-field="paran-date"></p>
+
+            <p class="t-label">
+              <Icon name="clock" class="icon-accent" size={16} />
+              Paran time
+            </p>
+            <div class="paran-window">
+              <div>
+                <span class="pw-label">Start</span>
+                <strong data-field="start">—</strong>
+              </div>
+              <span class="pw-dash" aria-hidden="true">–</span>
+              <div>
+                <span class="pw-label">End</span>
+                <strong data-field="end">—</strong>
+              </div>
+            </div>
+
+            {facts.length > 0 && (
+              <ul class="facts">
+                {facts.map((fact) => (
+                  <li>
+                    <span>{fact.label}</span>
+                    <strong data-field={fact.field}>—</strong>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {isCalculator && <ul class="why" data-field="why"></ul>}
+          </section>
+          );
+        })}
+      </div>
+
+      {isCalculator && (
+        <>
+          <AdSlot id="calc-banner" variant="banner" />
+
+          <p class="calendar-link">
+            <a href="/ekadashi-calendar">See all Ekadashi dates for the next 12 months →</a>
+          </p>
+
+          <details class="method">
+            <summary>How this is calculated</summary>
+            <dl class="meta-list" data-metadata></dl>
+            <p class="muted">
+              Each tradition follows its own rules for choosing the fasting day and the paran
+              window. Mahadvadashi classification is not applied yet, so days flagged above should
+              be checked against your local panchang.
+            </p>
+          </details>
+        </>
+      )}
+    </div>
+
+    <p class="note" data-error hidden></p>
+  </article>
+</section>
+
+<script>
+  import { calculateEkadashis } from '../engine/index';
+  import { formatLocalDate, formatLocalTime } from '../engine/astronomy/time';
+  import { formatFastingDate } from '../lib/display';
+  import { initLocationPicker } from '../scripts/location-picker';
+  import type {
+    CalculationLocation,
+    CalculationOutput,
+    ObservanceResult,
+  } from '../engine/types';
+
+  const root = document.querySelector<HTMLElement>('[data-next-ekadashi]');
+  const picker = root?.querySelector<HTMLElement>('[data-location-picker]');
+
+  if (root && picker) {
+    const section = root;
+    const errorBox = section.querySelector<HTMLElement>('[data-error]')!;
+    const results = section.querySelector<HTMLElement>('[data-results]')!;
+    const differNote = section.querySelector<HTMLElement>('[data-differ]')!;
+
+    /** Writes into a card field; fields a variant does not render are skipped. */
+    function setField(trad: string, name: string, text: string) {
+      const target = section.querySelector<HTMLElement>(`[data-trad="${trad}"] [data-field="${name}"]`);
+      if (target) target.textContent = text;
+    }
+
+    function showError(message: string | null) {
+      errorBox.hidden = !message;
+      if (message) errorBox.textContent = message;
+    }
+
+    const time = (iso: string | null, tz: string) =>
+      iso ? formatLocalTime(new Date(iso), tz) : '—';
+
+    const dateTime = (iso: string, tz: string) => {
+      const at = new Date(iso);
+      return `${formatLocalDate(at, tz)}, ${formatLocalTime(at, tz)}`;
+    };
+
+    function fillParana(trad: string, obs: ObservanceResult, tz: string) {
+      const { parana } = obs;
+
+      if (!parana.startUtc) {
+        setField(trad, 'paran-date', 'Not available for this day');
+        setField(trad, 'start', '—');
+        setField(trad, 'end', '—');
+        return;
+      }
+
+      const start = new Date(parana.startUtc);
+      const hasWindow = parana.status === 'window' && parana.endUtc;
+      setField(
+        trad,
+        'paran-date',
+        formatLocalDate(start, tz) + (hasWindow ? '' : ' · break after the start time'),
+      );
+      setField(trad, 'start', formatLocalTime(start, tz));
+      setField(
+        trad,
+        'end',
+        parana.endUtc ? formatLocalTime(new Date(parana.endUtc), tz) : 'before Dwadashi ends',
+      );
+    }
+
+    function fillWhy(trad: string, obs: ObservanceResult) {
+      const list = section.querySelector<HTMLElement>(`[data-trad="${trad}"] [data-field="why"]`);
+      if (!list) return;
+
+      const lines = obs.explanation.map((text) => ({ text, flag: false }));
+      const flags = obs.flags.map((flag) => ({ text: flag.replace(/-/g, ' '), flag: true }));
+
+      list.replaceChildren(
+        ...[...lines, ...flags].map(({ text, flag }) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          if (flag) li.className = 'flag';
+          return li;
+        }),
+      );
+    }
+
+    function fillTradition(trad: string, obs: ObservanceResult, tz: string) {
+      setField(trad, 'fast', formatFastingDate(obs.fastingDate));
+      fillParana(trad, obs, tz);
+
+      setField(trad, 'tithi-start', dateTime(obs.ekadashiStartUtc, tz));
+      setField(trad, 'tithi-end', dateTime(obs.ekadashiEndUtc, tz));
+      setField(trad, 'sunrise', time(obs.sunriseUtc, tz));
+      setField(trad, 'sunset', time(obs.sunsetUtc, tz));
+      setField(trad, 'arunodaya', time(obs.arunodayaUtc, tz));
+      setField(
+        trad,
+        'hari',
+        obs.parana.hariVasaraEndUtc ? time(obs.parana.hariVasaraEndUtc, tz) : 'not available',
+      );
+      fillWhy(trad, obs);
+    }
+
+    function fillMetadata(output: CalculationOutput, location: CalculationLocation) {
+      const list = section.querySelector<HTMLElement>('[data-metadata]');
+      if (!list) return;
+
+      const rows: Array<[string, string]> = [
+        ['Astronomy engine', output.metadata.astronomyEngine],
+        ['Ayanamsa', output.metadata.ayanamsa],
+        ['Sunrise convention', output.metadata.sunriseConvention],
+        ['Timezone', location.timezone],
+        ['Coordinates', `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`],
+        ['Elevation', `${location.elevation} m`],
+      ];
+
+      list.replaceChildren(
+        ...rows.flatMap(([label, value]) => {
+          const dt = document.createElement('dt');
+          dt.textContent = label;
+          const dd = document.createElement('dd');
+          dd.textContent = value;
+          return [dt, dd];
+        }),
+      );
+    }
+
+    function render(location: CalculationLocation) {
+      showError(null);
+
+      try {
+        const output = calculateEkadashis(location, { count: 1 });
+        const next = output.results[0];
+        if (!next) {
+          showError('No upcoming Ekadashi could be calculated for this location.');
+          return;
+        }
+
+        const name = next.smarta.name ?? next.vaishnava.name ?? 'Ekadashi';
+        section.querySelectorAll<HTMLElement>('[data-hero-name]').forEach((node) => {
+          node.textContent = name;
+        });
+
+        differNote.hidden = !next.datesDiffer;
+        fillTradition('smarta', next.smarta, location.timezone);
+        fillTradition('vaishnava', next.vaishnava, location.timezone);
+        fillMetadata(output, location);
+        results.hidden = false;
+      } catch (error) {
+        showError(
+          error instanceof Error ? `Calculation failed: ${error.message}` : 'Calculation failed.',
+        );
+      }
+    }
+
+    initLocationPicker(picker, render);
+  }
+</script>

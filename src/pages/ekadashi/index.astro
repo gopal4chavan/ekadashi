@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { cities, citiesByState, stateNames } from '../../data/cities';
+
+const byState = citiesByState();
+const stateOrder = ['UP', 'MH', 'HR', 'UK', 'CG', 'DL', 'KA', 'TN', 'WB', 'TS', 'RJ', 'MP', 'BR', 'CH', 'GJ'];
+const title = 'Ekadashi City Calendar — UP, Maharashtra, Haryana, Uttarakhand, Chhattisgarh';
+const description =
+  'Browse Ekadashi calendars by city. Strong coverage for Uttar Pradesh, Maharashtra, Haryana, Uttarakhand and Chhattisgarh.';
+---
+<BaseLayout title={title} description={description} canonicalPath="/ekadashi">
+  <section class="card">
+    <h1>Ekadashi calendars by city</h1>
+    <p class="muted">{cities.length} cities · Smarta &amp; Vaishnava · Paran time</p>
+  </section>
+
+  {stateOrder.filter((s) => byState[s]).map((state) => (
+    <section class="card">
+      <h2>{stateNames[state] ?? state}</h2>
+      <div class="city-grid">
+        {byState[state].map((c) => (
+          <a href={`/ekadashi/${c.slug}`}>{c.name}</a>
+        ))}
+      </div>
+    </section>
+  ))}
+</BaseLayout>

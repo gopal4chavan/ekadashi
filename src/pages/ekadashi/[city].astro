@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EkadashiYearList from '../../components/EkadashiYearList.astro';
+import { cities, getCity } from '../../data/cities';
+
+export function getStaticPaths() {
+  return cities.map((c) => ({ params: { city: c.slug } }));
+}
+
+const city = getCity(Astro.params.city!)!;
+
+const title = `Ekadashi in ${city.name} — Next 12 Months (Smarta & Vaishnava)`;
+const description = `Ekadashi calendar for ${city.name}: fasting dates and paran times for the next twelve months, for Smarta and Vaishnava.`;
+---
+<BaseLayout title={title} description={description} canonicalPath={`/ekadashi/${city.slug}`}>
+  <EkadashiYearList citySlug={city.slug} />
+</BaseLayout>

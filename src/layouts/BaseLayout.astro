@@ -1,0 +1,95 @@
+---
+import '../styles/global.css';
+import AdSlot from '../components/AdSlot.astro';
+import Icon from '../components/Icon.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+}
+const { title, description, canonicalPath = Astro.url.pathname } = Astro.props;
+const canonical = new URL(canonicalPath, Astro.site).toString();
+---
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#0f5f5c" />
+    <slot name="head" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="inner">
+        <a class="brand" href="/" aria-label="Ekadashi home">ekadashi</a>
+        <button
+          type="button"
+          class="menu-btn"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="site-menu"
+          data-menu-toggle
+        >
+          <Icon name="menu" size={26} />
+        </button>
+        <nav id="site-menu" class="site-menu" hidden aria-label="Main">
+          <a href="/">Next Ekadashi</a>
+          <a href="/ekadashi-calendar">12-Month Calendar</a>
+          <a href="/ekadashi-paran-kab-hai">Paran</a>
+          <a href="/ekadashi">Cities</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="main">
+        <slot />
+      </div>
+      <aside class="aside" aria-label="Advertisement">
+        <AdSlot id="sidebar" variant="sidebar" />
+      </aside>
+    </div>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <a class="brand" href="/">ekadashi</a>
+        <p>Ekadashi dates, paran time, Smarta &amp; Vaishnava calendars for Indian cities.</p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      (function () {
+        const btn = document.querySelector('[data-menu-toggle]');
+        const menu = document.getElementById('site-menu');
+        if (!btn || !menu) return;
+
+        function setOpen(open) {
+          menu.hidden = !open;
+          btn.setAttribute('aria-expanded', String(open));
+        }
+
+        btn.addEventListener('click', () => setOpen(menu.hidden));
+        document.addEventListener('click', (event) => {
+          if (!menu.hidden && !menu.contains(event.target) && !btn.contains(event.target)) {
+            setOpen(false);
+          }
+        });
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && !menu.hidden) {
+            setOpen(false);
+            btn.focus();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

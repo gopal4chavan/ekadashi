@@ -1,0 +1,12 @@
+---
+interface Props {
+  id: string;
+  variant?: 'banner' | 'inline' | 'sidebar';
+  label?: string;
+}
+const { id, variant = 'inline', label = 'Ad' } = Astro.props;
+---
+<aside class:list={['ad-slot', variant]} data-ad-slot={id} aria-label="Advertisement">
+  <span>{label}</span>
+  <!-- Replace with AdSense unit: data-ad-slot keeps placement stable -->
+</aside>

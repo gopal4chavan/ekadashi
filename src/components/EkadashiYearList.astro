@@ -1,0 +1,161 @@
+---
+import AdSlot from './AdSlot.astro';
+import Icon from './Icon.astro';
+import LocationPicker from './LocationPicker.astro';
+import { getCity } from '../data/cities';
+
+interface Props {
+  /** City pages open on that city; choosing another city opens its page. */
+  citySlug?: string;
+}
+
+const { citySlug } = Astro.props;
+const city = citySlug ? getCity(citySlug) : undefined;
+
+if (citySlug && !city) {
+  throw new Error(`EkadashiYearList: unknown city "${citySlug}"`);
+}
+---
+<section class="year-list" data-year-list>
+  <article class="hero-card">
+    <LocationPicker
+      title={city ? `Ekadashi in ${city.name}` : 'Ekadashi Calendar — Next 12 Months'}
+      subtitle="Every Ekadashi fasting date and Paran window for the next twelve months, for your location."
+      initialCity={city?.slug}
+      navigateOnCity={Boolean(city)}
+    />
+  </article>
+
+  <div data-results hidden>
+    <p class="list-summary" data-summary></p>
+
+    <ul class="list ekadashi-rows" data-rows></ul>
+
+    <AdSlot id="calendar-banner" variant="banner" />
+
+    <p class="calendar-link">
+      <a href="/">
+        <Icon name="crosshair" class="icon-accent" size={19} />
+        See the next Ekadashi in detail →
+      </a>
+    </p>
+  </div>
+
+  <p class="calc-loading" data-loading hidden>Calculating twelve months…</p>
+  <p class="note" data-error hidden></p>
+</section>
+
+<script>
+  import { calculateEkadashis } from '../engine/index';
+  import { formatFastingDate, formatParanaWindow } from '../lib/display';
+  import { initLocationPicker } from '../scripts/location-picker';
+  import type { CalculationLocation, ObservanceResult } from '../engine/types';
+
+  const root = document.querySelector<HTMLElement>('[data-year-list]');
+  const picker = root?.querySelector<HTMLElement>('[data-location-picker]');
+
+  if (root && picker) {
+    const el = (sel: string) => root.querySelector<HTMLElement>(sel)!;
+    const results = el('[data-results]');
+    const loading = el('[data-loading]');
+    const errorBox = el('[data-error]');
+
+    function showError(message: string | null) {
+      errorBox.hidden = !message;
+      if (message) errorBox.textContent = message;
+    }
+
+    function span(className: string, text: string): HTMLSpanElement {
+      const node = document.createElement('span');
+      node.className = className;
+      node.textContent = text;
+      return node;
+    }
+
+    function buildTradition(
+      label: string,
+      observance: ObservanceResult,
+      timezone: string,
+    ): HTMLLIElement {
+      const li = document.createElement('li');
+      li.append(
+        span('trad-label', label),
+        span('when', formatFastingDate(observance.fastingDate)),
+        span('meta', `Paran ${formatParanaWindow(observance.parana, timezone)}`),
+      );
+
+      if (observance.flags.length > 0) {
+        li.appendChild(
+          span('meta row-flags', observance.flags.map((f) => f.replace(/-/g, ' ')).join(' · ')),
+        );
+      }
+
+      return li;
+    }
+
+    function buildEkadashi(
+      name: string,
+      smarta: ObservanceResult,
+      vaishnava: ObservanceResult,
+      timezone: string,
+    ): HTMLLIElement {
+      const li = document.createElement('li');
+      li.className = 'ek-entry';
+      const items = document.createElement('ul');
+      items.className = 'trad-items';
+      items.append(
+        buildTradition('Smarta', smarta, timezone),
+        buildTradition('Vaishnava', vaishnava, timezone),
+      );
+      li.append(span('name', name), items);
+      return li;
+    }
+
+    function render(location: CalculationLocation) {
+      loading.hidden = false;
+      showError(null);
+
+      // Yield once so the loading state paints before the engine runs.
+      window.setTimeout(() => {
+        try {
+          const output = calculateEkadashis(location, { count: 24 });
+          if (output.results.length === 0) {
+            showError('No Ekadashi dates could be calculated for this location.');
+            return;
+          }
+
+          const tz = location.timezone;
+          const differing = output.results.filter((r) => r.datesDiffer).length;
+
+          el('[data-summary]').textContent =
+            `${output.results.length} Ekadashis · ${location.label} · ${tz}` +
+            (differing > 0
+              ? ` · Smarta and Vaishnava differ on ${differing} of them`
+              : ' · Smarta and Vaishnava agree on every date');
+
+          const rows = el('[data-rows]');
+          rows.replaceChildren(
+            ...output.results.map((row) =>
+              buildEkadashi(
+                row.smarta.name ?? row.vaishnava.name ?? 'Ekadashi',
+                row.smarta,
+                row.vaishnava,
+                tz,
+              ),
+            ),
+          );
+
+          results.hidden = false;
+        } catch (error) {
+          showError(
+            error instanceof Error ? `Calculation failed: ${error.message}` : 'Calculation failed.',
+          );
+        } finally {
+          loading.hidden = true;
+        }
+      }, 0);
+    }
+
+    initLocationPicker(picker, render);
+  }
+</script>

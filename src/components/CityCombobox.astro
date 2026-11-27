@@ -1,0 +1,88 @@
+---
+/**
+ * The single city picker used across the app: a trigger that opens a panel with
+ * a search box, an optional "Use my current location" action, and the city list.
+ * Behaviour lives in src/scripts/city-combobox.ts.
+ */
+import { cities, defaultCitySlug, stateNames } from '../data/cities';
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Unique per page; ties the trigger, panel and list together for assistive tech. */
+  id?: string;
+  /** `field` shows the current city; `link` is a compact text action. */
+  variant?: 'field' | 'link';
+  showGps?: boolean;
+  /** Trigger text; defaults to the selected city's name. */
+  label?: string;
+  selected?: string;
+}
+
+const {
+  id = 'city',
+  variant = 'field',
+  showGps = true,
+  label,
+  selected = defaultCitySlug,
+} = Astro.props;
+
+const options = [...cities].sort((a, b) => a.name.localeCompare(b.name));
+const triggerLabel = label ?? cities.find((c) => c.slug === selected)?.name ?? 'Select city';
+---
+<div class:list={['city-combobox', `cc-${variant}`]} data-city-combobox>
+  <button
+    type="button"
+    class="cc-trigger"
+    data-cc-trigger
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    aria-controls={`${id}-panel`}
+  >
+    <Icon name="pin" class="icon-accent" size={18} />
+    <span class="cc-label" data-cc-label>{triggerLabel}</span>
+    <Icon name="chevron-down" class="cc-chevron" size={16} />
+  </button>
+
+  <div class="cc-panel" id={`${id}-panel`} data-cc-panel hidden>
+    <div class="cc-search">
+      <Icon name="search" class="icon-muted" size={18} />
+      <input
+        type="text"
+        role="combobox"
+        aria-expanded="true"
+        aria-autocomplete="list"
+        aria-controls={`${id}-list`}
+        aria-label="Search city or state"
+        placeholder="Search city or state"
+        autocomplete="off"
+        spellcheck="false"
+        data-cc-search
+      />
+    </div>
+
+    {showGps && (
+      <button type="button" class="cc-gps" data-cc-gps>
+        <Icon name="crosshair" class="icon-accent" size={18} />
+        Use my current location
+      </button>
+    )}
+
+    <ul class="cc-list" role="listbox" id={`${id}-list`} aria-label="Cities" data-cc-list>
+      {options.map((c) => (
+        <li
+          role="option"
+          id={`${id}-opt-${c.slug}`}
+          data-slug={c.slug}
+          data-name={c.name}
+          data-search={`${c.name} ${c.state} ${stateNames[c.state] ?? ''}`.toLowerCase()}
+          aria-selected={c.slug === selected ? 'true' : 'false'}
+        >
+          <span class="cc-name">{c.name}</span>
+          <span class="cc-state">{stateNames[c.state] ?? c.state}</span>
+        </li>
+      ))}
+    </ul>
+
+    <p class="cc-empty" data-cc-empty hidden>No city matches your search.</p>
+  </div>
+</div>

@@ -1,0 +1,139 @@
+---
+/** Stroke icons aligned with theme-1 preview (Lucide + IconPark outline lotus). */
+interface Props {
+  name:
+    | 'pin'
+    | 'calendar'
+    | 'calendar-clock'
+    | 'clock'
+    | 'sun'
+    | 'sunrise'
+    | 'sunset'
+    | 'moon'
+    | 'lotus'
+    | 'crosshair'
+    | 'info'
+    | 'search'
+    | 'chevron-down'
+    | 'menu';
+  class?: string;
+  size?: number;
+}
+
+const { name, class: className = '', size = 20 } = Astro.props;
+
+type IconDef = { viewBox: string; strokeWidth: number; markup: string; filled?: boolean };
+
+const icons: Record<Props['name'], IconDef> = {
+  pin: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup:
+      '<path d="M12 22s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',
+  },
+  calendar: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup:
+      '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>',
+  },
+  'calendar-clock': {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup:
+      '<path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/>' +
+      '<path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/>' +
+      '<path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/>',
+  },
+  clock: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  },
+  sun: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup:
+      '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  },
+  sunrise: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup:
+      '<path d="M12 2v8"/>' +
+      '<path d="m4.93 10.93 1.41 1.41"/>' +
+      '<path d="M2 18h2"/><path d="M20 18h2"/>' +
+      '<path d="m19.07 10.93-1.41 1.41"/>' +
+      '<path d="M22 22H2"/>' +
+      '<path d="m8 6 4-4 4 4"/>' +
+      '<path d="M16 18a4 4 0 0 0-8 0"/>',
+  },
+  sunset: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup:
+      '<path d="M12 10V2"/>' +
+      '<path d="m4.93 10.93 1.41 1.41"/>' +
+      '<path d="M2 18h2"/><path d="M20 18h2"/>' +
+      '<path d="m19.07 10.93-1.41 1.41"/>' +
+      '<path d="M22 22H2"/>' +
+      '<path d="m16 6-4 4-4-4"/>' +
+      '<path d="M16 18a4 4 0 0 0-8 0"/>',
+  },
+  moon: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup: '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 7 7 0 0 0 20 14.5z"/>',
+  },
+  crosshair: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup:
+      '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/>' +
+      '<path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+  },
+  info: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/>',
+  },
+  search: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  },
+  'chevron-down': {
+    viewBox: '0 0 24 24',
+    strokeWidth: 2,
+    markup: '<path d="m6 9 6 6 6-6"/>',
+  },
+  lotus: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 0,
+    filled: true,
+    markup:
+      '<path d="M12 19.135c-2.363 1.041-5.069 1.16-7.489.22c-.841-.326-2.067-.933-2.42-1.834l-.116-.525l.122-.534l.24-.398c.529-.708 1.414-1.11 2.209-1.43c-.759-1.187-1.978-3.737-1.302-5.16l.29-.434l.42-.286c.377-.185.828-.209 1.239-.186c.45.025.897.122 1.329.249c.575.17 1.133.401 1.664.679c.131-.609.276-1.203.49-1.789c.464-1.266 1.716-3.72 3.324-3.72s2.86 2.454 3.324 3.72c.214.586.359 1.18.49 1.789a9.3 9.3 0 0 1 1.664-.679a6 6 0 0 1 1.329-.249c.788-.045 1.577.124 1.949.906c.676 1.423-.543 3.973-1.302 5.16c.795.32 1.68.722 2.209 1.43c.332.445.454.925.246 1.457c-.353.901-1.579 1.508-2.42 1.834c-2.42.94-5.126.821-7.489-.22m6.138-2.833a10.4 10.4 0 0 1-2.068 1.695c1.281-.043 2.566-.302 3.661-.996c-.492-.321-1.031-.534-1.593-.699m-12.276 0c-.562.165-1.101.378-1.593.699c1.094.694 2.38.953 3.66.996a10.4 10.4 0 0 1-2.067-1.695m6.095.604l.043-.022l.043.022c.56-.498.937-1.186 1.23-1.867c1.017-2.37.963-5.164-.185-7.479c-.276-.556-.612-1.096-1.088-1.502c-.476.406-.812.946-1.088 1.502c-1.148 2.315-1.202 5.109-.185 7.479c.293.681.67 1.369 1.23 1.867m-3.951-5.212c-.904-.549-1.873-1.022-2.938-1.127c.072.799.366 1.561.736 2.268a9.17 9.17 0 0 0 3.356 3.57c-.736-1.476-1.101-3.066-1.154-4.711m7.988 0c-.053 1.645-.418 3.235-1.154 4.711a9.15 9.15 0 0 0 3.57-4.008c.264-.583.464-1.191.521-1.83c-1.065.105-2.033.578-2.937 1.127"/>',
+  },
+  menu: {
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.8,
+    markup: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  },
+};
+
+const icon = icons[name];
+const filled = icon.filled === true;
+---
+<svg
+  class:list={['icon', className]}
+  viewBox={icon.viewBox}
+  width={size}
+  height={size}
+  fill={filled ? 'currentColor' : 'none'}
+  stroke={filled ? 'none' : 'currentColor'}
+  stroke-width={filled ? undefined : icon.strokeWidth}
+  stroke-linecap={filled ? undefined : 'round'}
+  stroke-linejoin={filled ? undefined : 'round'}
+  aria-hidden="true"
+  set:html={icon.markup}
+/>

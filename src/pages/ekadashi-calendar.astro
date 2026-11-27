@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EkadashiYearList from '../components/EkadashiYearList.astro';
+
+const title = 'Ekadashi Calendar — Next 12 Months of Dates & Paran Times';
+const description =
+  'All Ekadashi fasting dates and Paran timings for the next 12 months, calculated for your location. Smarta and Vaishnava dates shown side by side.';
+---
+<BaseLayout title={title} description={description} canonicalPath="/ekadashi-calendar">
+  <EkadashiYearList />
+</BaseLayout>

@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NextEkadashiCard from '../components/NextEkadashiCard.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const title = 'Ekadashi Paran Kab Hai? Paran Start & End Time (Smarta & Vaishnava)';
+const description =
+  'Paran kab hai after Ekadashi? Exact paran start and end time for your location, for Smarta and Vaishnava, with Hari Vasara explained.';
+---
+<BaseLayout title={title} description={description} canonicalPath="/ekadashi-paran-kab-hai">
+  <NextEkadashiCard variant="paran" />
+
+  <AdSlot id="paran-mid" />
+
+  <section class="card faq">
+    <h2>Paran rules (short)</h2>
+    <ol>
+      <li>Fast on the Ekadashi day (Smarta or Vaishnava as you follow).</li>
+      <li>Break the fast the next day, on Dwadashi, after sunrise.</li>
+      <li>Vaishnava paran waits until <strong>Hari Vasara</strong> — the first quarter of Dwadashi — ends.</li>
+      <li>Finish within the first third of the day, and before Dwadashi ends.</li>
+    </ol>
+    <p class="muted">
+      Times above are calculated for your selected location. See the
+      <a href="/ekadashi-calendar">12-month calendar</a> for every upcoming paran window.
+    </p>
+  </section>
+</BaseLayout>

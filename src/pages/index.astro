@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NextEkadashiCard from '../components/NextEkadashiCard.astro';
+
+const title = 'Ekadashi Kab Hai? Next Date, Paran Time (Smarta & Vaishnava)';
+const description =
+  'Ekadashi kab hai aaj? Find next Ekadashi date, paran kab hai, Smarta and Vaishnava timings, tithi, sunrise and Hari Vasara for your city.';
+---
+<BaseLayout title={title} description={description} canonicalPath="/">
+  <NextEkadashiCard variant="calculator" title="Ekadashi kab hai?" />
+</BaseLayout>
